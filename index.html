@@ -1,1 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIE Exam Study Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:15px}
+.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:14px 16px;position:sticky;top:0;z-index:100}
+.header h1{font-size:18px;font-weight:600;color:#1a1a1a}
+.header p{font-size:12px;color:#888;margin-top:2px}
+.nav{display:flex;gap:4px;flex-wrap:wrap;background:#fff;padding:10px 12px;border-bottom:1px solid #e0e0e0;position:sticky;top:64px;z-index:99}
+.nav button{background:transparent;border:1px solid #ddd;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;color:#666;transition:all .15s;white-space:nowrap}
+.nav button.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.nav button:hover:not(.active){background:#f0f0f0}
+.page{display:none;padding:16px;max-width:720px;margin:0 auto}.page.active{display:block}
+h2{font-size:17px;font-weight:600;margin-bottom:6px}
+h3{font-size:14px;font-weight:600;margin-bottom:6px}
+p{font-size:13px;color:#555;line-height:1.6;margin-bottom:8px}
 
+/* PLAN */
+.week-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px;margin-bottom:10px}
+.week-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.week-label{font-size:14px;font-weight:600}
+.week-dates{font-size:11px;color:#888;background:#f5f5f3;padding:3px 8px;border-radius:10px}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pill{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500}
+.p-blue{background:#e8f0fe;color:#1a56db}
+.p-green{background:#e3f6e8;color:#1a7a3a}
+.p-amber{background:#fef3c7;color:#92400e}
+.p-purple{background:#ede9fe;color:#5b21b6}
+.p-gray{background:#f0f0f0;color:#555}
+.p-red{background:#fee2e2;color:#991b1b}
+.daily-tip{font-size:12px;color:#666;background:#f9f9f7;padding:8px 10px;border-radius:8px;margin-top:8px;border-left:3px solid #1a1a1a}
+
+/* GUIDE */
+.domain-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.domain-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;user-select:none}
+.domain-hdr:hover{background:#f9f9f7}
+.domain-title{font-size:14px;font-weight:600}
+.domain-right{display:flex;align-items:center;gap:10px}
+.domain-pct{font-size:11px;background:#f0f0f0;padding:3px 8px;border-radius:10px;color:#555}
+.chevron{font-size:11px;color:#aaa;transition:transform .2s}
+.chevron.open{transform:rotate(90deg)}
+.domain-body{display:none;border-top:1px solid #f0f0f0}
+.domain-body.open{display:block}
+.topic{padding:12px 15px;border-bottom:1px solid #f5f5f3}
+.topic:last-child{border-bottom:none}
+.topic strong{display:block;font-size:13px;font-weight:600;margin-bottom:3px}
+.topic p{font-size:12px;margin:0}
+.domain-quiz-btn{margin:10px 15px;font-size:12px;padding:7px 14px;cursor:pointer;background:#1a1a1a;color:#fff;border:none;border-radius:8px}
+
+/* QUIZ */
+.quiz-top{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.domain-sel{flex:1;min-width:200px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.diff-sel{padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.progress-track{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.progress-bar{flex:1;height:5px;background:#e8e8e8;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:#1a1a1a;border-radius:3px;transition:width .3s}
+.progress-label{font-size:11px;color:#888;white-space:nowrap}
+.q-num{font-size:11px;color:#888;margin-bottom:6px}
+.question-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px;margin-bottom:10px}
+.question-text{font-size:14px;color:#1a1a1a;line-height:1.6;margin-bottom:12px;font-weight:500}
+.option{display:block;width:100%;text-align:left;padding:10px 13px;margin-bottom:6px;border:1px solid #e0e0e0;border-radius:9px;font-size:13px;cursor:pointer;background:#fff;color:#1a1a1a;transition:all .15s;line-height:1.5}
+.option:hover:not(:disabled){background:#f5f5f3;border-color:#ccc}
+.option.correct{background:#dcfce7;border-color:#16a34a;color:#15532b}
+.option.wrong{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+.option.reveal-correct{background:#dcfce7;border-color:#16a34a;color:#15532b}
+.explain{font-size:12px;color:#444;padding:10px 12px;background:#f5f5f3;border-radius:8px;margin-top:6px;line-height:1.6;display:none;border-left:3px solid #1a1a1a}
+.explain.show{display:block}
+.score-box{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.score-num{font-size:22px;font-weight:700}
+.score-label{font-size:11px;color:#888}
+.quiz-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn-next{padding:9px 20px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
+.btn-next:hover{background:#333}
+.btn-restart{padding:9px 16px;background:transparent;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer}
+.btn-restart:hover{background:#f0f0f0}
+
+/* LEARN TAB */
+.learn-sel{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;background:#fff;margin-bottom:14px;font-weight:500}
+.learn-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:16px;margin-bottom:10px}
+.learn-card h3{font-size:15px;margin-bottom:8px;color:#1a1a1a}
+.concept-block{padding:10px;background:#f9f9f7;border-radius:8px;margin-bottom:8px;border-left:3px solid #1a1a1a}
+.concept-block .label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.concept-block .value{font-size:13px;color:#1a1a1a;line-height:1.5}
+
+/* Flashcard */
+.flashcard-area{perspective:1000px;margin:12px 0}
+.flashcard{width:100%;min-height:140px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .5s}
+.flashcard.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;min-height:140px;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;border:1px solid #e0e0e0}
+.card-front{background:#1a1a1a;color:#fff}
+.card-front p{color:#ddd;font-size:13px}
+.card-back{background:#fff;transform:rotateY(180deg)}
+.card-back p{color:#333;font-size:13px}
+.fc-label{font-size:10px;font-weight:600;letter-spacing:1px;opacity:.6;margin-bottom:6px;text-transform:uppercase}
+.fc-text{font-size:16px;font-weight:600;line-height:1.4}
+.fc-nav{display:flex;gap:8px;margin-top:8px;align-items:center;justify-content:space-between}
+.fc-nav button{padding:7px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:12px;cursor:pointer}
+.fc-nav button:hover{background:#f0f0f0}
+.fc-counter{font-size:12px;color:#888}
+
+/* Memory tricks */
+.trick-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px;margin-bottom:10px}
+.trick-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:6px}
+.mnemonic{font-size:22px;font-weight:800;letter-spacing:2px;color:#1a1a1a;margin:8px 0 4px}
+.mnemonic-expand{font-size:12px;color:#555;line-height:1.6}
+
+/* Interactive bond calculator */
+.calc-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.calc-row label{font-size:12px;color:#666;min-width:120px}
+.calc-row input[type=range]{flex:1;min-width:120px}
+.calc-row .val{font-size:13px;font-weight:600;min-width:60px;text-align:right}
+.result-box{background:#f0f0f0;border-radius:8px;padding:10px 14px;margin-top:8px}
+.result-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.result-row span:first-child{color:#666}
+.result-row span:last-child{font-weight:600}
+
+/* Tips */
+.tip-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px;margin-bottom:10px}
+.numbers-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.num-box{background:#f9f9f7;border-radius:8px;padding:10px;text-align:center}
+.num-big{font-size:22px;font-weight:800;color:#1a1a1a}
+.num-label{font-size:11px;color:#666;margin-top:2px}
+
+/* Final score screen */
+.final-score{text-align:center;padding:30px 16px}
+.score-circle{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;font-weight:800;border:4px solid}
+.grade-label{font-size:16px;font-weight:600;margin-bottom:6px}
+.grade-sub{font-size:13px;color:#666;margin-bottom:16px}
+
+@media(max-width:500px){
+  .nav button{font-size:11px;padding:5px 10px}
+  .numbers-grid{grid-template-columns:1fr 1fr}
+  .calc-row label{min-width:100px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SIE Exam Study Hub</h1>
+  <p>FINRA Securities Industry Essentials · Target: April 2026 · Passing score: 70%</p>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showPage('plan',this)">📅 Plan</button>
+  <button onclick="showPage('guide',this)">📖 Guide</button>
+  <button onclick="showPage('learn',this)">🧠 Learn</button>
+  <button onclick="showPage('quiz',this)">✏️ Quiz</button>
+  <button onclick="showPage('tips',this)">⭐ Tips</button>
+</div>
+
+<!-- ============ PLAN ============ -->
+<div id="plan" class="page active">
+  <h2>4-Week Study Plan</h2>
+  <p style="margin-bottom:12px">75 questions · 105 minutes · Pass = 70% · Exam at Prometric or remote. You have ~4 weeks — here's the roadmap.</p>
+
+  <div class="week-card" style="border-left:4px solid #1a1a1a">
+    <div class="week-header"><span class="week-label">Week 1 — Foundations</span><span class="week-dates">Mar 24 – Mar 30</span></div>
+    <p>Build the base. Understand capital markets structure, equity securities, and basic debt. Don't memorize yet — build mental models first.</p>
+    <div class="pills">
+      <span class="pill p-blue">Capital markets structure</span>
+      <span class="pill p-blue">Primary vs secondary markets</span>
+      <span class="pill p-blue">Common &amp; preferred stock</span>
+      <span class="pill p-blue">Bond basics</span>
+      <span class="pill p-blue">Money market instruments</span>
+    </div>
+    <div class="daily-tip">Daily: 50–60 min · Read 1 topic → do 10 practice Qs → review wrong answers · No cram sessions yet</div>
+  </div>
+
+  <div class="week-card" style="border-left:4px solid #1a56db">
+    <div class="week-header"><span class="week-label">Week 2 — Products Deep Dive</span><span class="week-dates">Mar 31 – Apr 6</span></div>
+    <p>Domain 2 is 44% of your exam. Spend the most time here. Packaged products, options, munis, derivatives, annuities, and risk types.</p>
+    <div class="pills">
+      <span class="pill p-purple">Municipal bonds</span>
+      <span class="pill p-purple">Mutual funds &amp; ETFs</span>
+      <span class="pill p-purple">Options (calls &amp; puts)</span>
+      <span class="pill p-purple">Annuities</span>
+      <span class="pill p-purple">REITs &amp; DPPs</span>
+      <span class="pill p-purple">Risk types</span>
+    </div>
+    <div class="daily-tip">Daily: 60 min · Alternate: read one day, practice Qs next day · Use the flashcards on the Learn tab every night</div>
+  </div>
+
+  <div class="week-card" style="border-left:4px solid #d97706">
+    <div class="week-header"><span class="week-label">Week 3 — Trading, Accounts &amp; Rules</span><span class="week-dates">Apr 7 – Apr 13</span></div>
+    <p>Order types, settlement, margin, account types, prohibited practices, and AML rules. Heavy on scenario questions.</p>
+    <div class="pills">
+      <span class="pill p-amber">Order types</span>
+      <span class="pill p-amber">Margin &amp; Reg T</span>
+      <span class="pill p-amber">Account types</span>
+      <span class="pill p-amber">Prohibited practices</span>
+      <span class="pill p-amber">AML / BSA rules</span>
+      <span class="pill p-amber">Corporate actions</span>
+    </div>
+    <div class="daily-tip">Daily: 60 min · Do 25-Q timed mini-exams · Track which topics you keep getting wrong → focus there</div>
+  </div>
+
+  <div class="week-card" style="border-left:4px solid #16a34a">
+    <div class="week-header"><span class="week-label">Week 4 — Regulatory Framework + Full Review</span><span class="week-dates">Apr 14 – Apr 20</span></div>
+    <p>Finish regulatory framework (smaller domain but guaranteed questions). Then drill full 75-Q practice exams under timed conditions.</p>
+    <div class="pills">
+      <span class="pill p-green">Securities laws (1933, 1934, etc.)</span>
+      <span class="pill p-green">FINRA / MSRB / SEC roles</span>
+      <span class="pill p-green">Reg BI &amp; suitability</span>
+      <span class="pill p-green">Full practice exams</span>
+      <span class="pill p-green">Weak area review</span>
+    </div>
+    <div class="daily-tip">Mon &amp; Thu: full 75-Q timed exam · Other days: review missed topics · Sat: light flashcard review only</div>
+  </div>
+
+  <div class="week-card" style="border-left:4px solid #dc2626">
+    <div class="week-header"><span class="week-label">Exam Week — Final Prep</span><span class="week-dates">Apr 21–25 target window</span></div>
+    <p>Book at <strong>prometric.com/finra</strong> or opt for remote online testing. Aim Tuesday–Thursday. Exam cost is $80 (pay through FINRA's candidate portal at finra.org).</p>
+    <div class="pills">
+      <span class="pill p-red">Book Prometric now!</span>
+      <span class="pill p-gray">2 days before: review key numbers only</span>
+      <span class="pill p-gray">Day before: rest, sleep well</span>
+      <span class="pill p-gray">Exam day: arrive 30 min early</span>
+    </div>
+    <div class="daily-tip">Aim for 75–80%+ on practice exams before test day. If scoring below 70%, push exam date back 1 week — better to delay than retake.</div>
+  </div>
+
+  <div class="learn-card" style="margin-top:4px">
+    <h3>Daily study routine that works</h3>
+    <p><strong>Phase 1 (10 min):</strong> Flashcard drill on yesterday's topic</p>
+    <p><strong>Phase 2 (25 min):</strong> Read new topic in the Guide tab</p>
+    <p><strong>Phase 3 (20 min):</strong> Do 15–20 practice Qs on that topic</p>
+    <p><strong>Phase 4 (5 min):</strong> Review every wrong answer — write down why</p>
+    <p style="margin:0;font-size:12px;color:#888">Total: ~60 min/day. Weekends: do a 25-Q mixed quiz instead of new content</p>
+  </div>
+</div>
+
+<!-- ============ GUIDE ============ -->
+<div id="guide" class="page">
+  <h2>Complete Study Guide</h2>
+  <p style="margin-bottom:12px">All 4 FINRA domains, aligned to the official SIE Content Outline. Tap any domain to expand.</p>
+
+  <!-- DOMAIN 1 -->
+  <div class="domain-card">
+    <div class="domain-hdr" onclick="toggleDomain(this)">
+      <span class="domain-title">Domain 1 — Knowledge of Capital Markets</span>
+      <div class="domain-right"><span class="domain-pct">16% · ~12 questions</span><span class="chevron">▶</span></div>
+    </div>
+    <div class="domain-body">
+      <div class="topic"><strong>Primary vs. Secondary Markets</strong><p>Primary market: issuer sells NEW securities to investors (IPOs, follow-on offerings). Underwriters facilitate. Secondary market: investors trade ALREADY-ISSUED securities among themselves (NYSE, NASDAQ, OTC). Issuer receives no proceeds from secondary trades.</p></div>
+      <div class="topic"><strong>Market Participants</strong><p>Broker-dealers (buy/sell for clients and own account). Market makers (always willing to buy/sell, profit from bid-ask spread). Transfer agents (maintain shareholder records, issue/cancel certificates). Registrars (ensure shares don't exceed authorized amounts). Clearing corporations like DTCC (settle trades, reduce counterparty risk).</p></div>
+      <div class="topic"><strong>Underwriting Types</strong><p>Firm commitment: underwriter buys ALL shares from issuer, resells to public — assumes all risk. Best efforts: underwriter sells what it can, returns unsold shares — issuer bears risk. All-or-none: offering cancelled if not fully sold. Mini-max: offering needs minimum sold to proceed.</p></div>
+      <div class="topic"><strong>Economic Indicators &amp; Fed Policy</strong><p>Business cycle: expansion → peak → contraction (recession) → trough → recovery. Fed tools: open market operations (most common — buy = loosen, sell = tighten), discount rate, reserve requirements. Hawkish Fed = raising rates (fight inflation). Dovish Fed = lowering rates (stimulate economy). Rising rates → bond prices fall, shorter maturities preferred.</p></div>
+      <div class="topic"><strong>Offering Documents</strong><p>Prospectus: required disclosure document for registered offerings. Red herring (preliminary prospectus): distributed during cooling-off period, lacks final price/date. Final prospectus: must be delivered at or before sale. Official statement: muni bond equivalent of a prospectus. Reg D prospectus: private placement document.</p></div>
+      <div class="topic"><strong>Regulation D &amp; Exempt Offerings</strong><p>Reg D: exempts private placements from full SEC registration. Accredited investors only (net worth &gt;$1M excluding home, OR income &gt;$200k/$300k joint). Rule 144: governs resale of restricted/control securities. Rule 147: intrastate offerings exempt (issuer and buyers in same state). Rule 144A: allows resale of restricted securities to QIBs.</p></div>
+      <div class="topic"><strong>Money Market Instruments</strong><p>T-bills (91-day, 182-day, 52-week — issued at discount). Commercial paper (unsecured, corporate, max 270 days). Bankers' acceptances (trade finance, 9-month max). Negotiable CDs (bank-issued, $100k+ denominations). Federal funds (overnight bank-to-bank loans at fed funds rate). Repos (repurchase agreements — overnight secured lending).</p></div>
+      <button class="domain-quiz-btn" onclick="startFilteredQuiz(1)">Practice Domain 1 Questions →</button>
+    </div>
+  </div>
+
+  <!-- DOMAIN 2 -->
+  <div class="domain-card">
+    <div class="domain-hdr" onclick="toggleDomain(this)">
+      <span class="domain-title">Domain 2 — Understanding Products &amp; Their Risks</span>
+      <div class="domain-right"><span class="domain-pct">44% · ~33 questions</span><span class="chevron">▶</span></div>
+    </div>
+    <div class="domain-body">
+      <div class="topic"><strong>Common Stock</strong><p>Ownership in a corporation. Rights: vote on major issues (one share = one vote), receive dividends (not guaranteed), residual claim in liquidation (last in line). Limited liability — can't lose more than invested. Preemptive rights let existing shareholders maintain ownership percentage in new offerings. Stock splits: 2:1 split → shares double, price halves, no change in value.</p></div>
+      <div class="topic"><strong>Preferred Stock</strong><p>Fixed dividend, priority over common in dividends and liquidation. Typically no voting rights. Types: Cumulative (missed dividends accumulate, must all be paid before common gets anything). Non-cumulative (missed = gone). Convertible (can convert to common at set ratio). Callable (issuer can redeem). Participating (may receive extra dividends above stated rate). Par value typically $100.</p></div>
+      <div class="topic"><strong>Bond Fundamentals</strong><p>Par value = $1,000. Coupon = annual interest rate × par. Price and yield move OPPOSITE directions (key relationship). Premium bond: price &gt; par → YTM &lt; coupon. Discount bond: price &lt; par → YTM &gt; coupon. Current yield = annual interest / market price. YTM accounts for price discount/premium amortized to maturity. YTC = yield if called at first call date. YTW (yield to worst) = lowest possible yield.</p></div>
+      <div class="topic"><strong>U.S. Government Securities</strong><p>T-bills: 4–52 weeks, issued at discount (no coupon), most liquid. T-notes: 2–10 years, semi-annual coupon. T-bonds: 10–30 years, semi-annual coupon. TIPS (Treasury Inflation-Protected Securities): principal adjusts with CPI. Series EE bonds: sold at discount, double in 20 years. Agency securities: GNMA (govt-backed), FNMA/FHLMC (GSEs, not direct govt guarantee). All backed by U.S. government = lowest default risk.</p></div>
+      <div class="topic"><strong>Corporate Bonds</strong><p>Senior secured (backed by collateral, paid first in default). Senior unsecured debentures (no collateral, still senior). Subordinated debentures (paid after senior unsecured). Convertible bonds (can convert to stock, carry lower coupon). Zero-coupon bonds (issued at deep discount, no periodic interest, phantom income taxed annually). Investment grade: BBB-/Baa3 or above. Below = speculative/junk/high-yield.</p></div>
+      <div class="topic"><strong>Municipal Bonds</strong><p>General Obligation (GO): backed by taxing power of municipality — safest muni. Revenue bonds: backed only by revenues from specific project (hospital, toll road, utility) — higher risk than GO. Interest is exempt from federal income tax (usually exempt from state/local tax if you live in issuing state). Not appropriate for tax-exempt accounts (IRAs, 401ks). Equivalent taxable yield = muni yield ÷ (1 - tax bracket). Munis use 30/360 day-count convention. Official statement = muni prospectus.</p></div>
+      <div class="topic"><strong>Mutual Funds (Open-End Investment Companies)</strong><p>NAV = (Total Assets − Liabilities) ÷ shares outstanding. Calculated once daily at market close (4pm ET). Shares redeemed at NAV (no secondary trading). Load = sales charge. Class A: front-end load (charged at purchase, lower ongoing expenses — best for long-term). Class B: back-end/CDSC load (charged at redemption, converts to A after several years). Class C: level load (annual fee ~1%, no front-end, best for short term). No-load funds: sold direct, no sales charge. 12b-1 fees: ongoing distribution/marketing fees charged annually.</p></div>
+      <div class="topic"><strong>ETFs &amp; Closed-End Funds</strong><p>ETFs: trade on exchange like stocks, continuously priced throughout day. Usually passively managed (index-tracking). Lower expense ratios than mutual funds. Can be bought on margin, sold short. Closed-end funds: fixed number of shares, trade on exchange. Price can trade at premium or DISCOUNT to NAV (unlike mutual funds). UITs (Unit Investment Trusts): fixed, unmanaged portfolio, no ongoing management, dissolves at set date.</p></div>
+      <div class="topic"><strong>Options Basics</strong><p>Call option: RIGHT to BUY 100 shares at strike price. Put option: RIGHT to SELL 100 shares at strike price. Buyer pays premium to seller (writer). In the money: call when stock &gt; strike; put when stock &lt; strike. At the money: stock = strike. Out of the money: call when stock &lt; strike; put when stock &gt; strike. Intrinsic value + time value = premium. American options: exercise any time before expiration. European options: exercise only at expiration. Options not appropriate for all investors — suitability required.</p></div>
+      <div class="topic"><strong>Options Strategies</strong><p>Long call: bullish, max loss = premium. Long put: bearish, max gain = strike - premium. Covered call: own stock + sell call = generates income, caps upside. Protective put: own stock + buy put = insurance against decline. Short call: bearish/neutral, max gain = premium, unlimited risk. Short put: bullish/neutral. Married put = protective put on newly purchased stock. Straddle: buy call + put at same strike = profits from big move either direction.</p></div>
+      <div class="topic"><strong>Variable Annuities &amp; Insurance Products</strong><p>Fixed annuity: guaranteed return, in general account. Variable annuity: performance-based, in separate account (like a mutual fund), owner bears investment risk. Accumulation units (during growth phase) → annuity units (during payout). Death benefit: typically returns greater of account value or amount paid in. Surrender charges: apply if early withdrawal. Variable annuities are securities — require securities license. Fixed annuities are insurance products only. 1035 exchange: tax-free swap of one annuity/life policy for another.</p></div>
+      <div class="topic"><strong>Alternative &amp; Packaged Products</strong><p>REITs: must distribute 90% of taxable income as dividends, pass-through tax treatment, highly liquid (exchange-traded). DPPs (Direct Participation Programs): LPs, oil/gas, real estate — illiquid, pass-through tax losses, accredited investors, long lock-up. Hedge funds: private, unregistered, only qualified/accredited investors, very illiquid. Private equity: buy/restructure private companies, 10+ year lock-ups. Variable life insurance: cash value tied to separate account performance, death benefit may fluctuate.</p></div>
+      <div class="topic"><strong>Key Risk Types (Must Know All)</strong><p>Market risk: overall market decline. Credit/default risk: issuer fails to pay. Interest rate risk: bond prices fall when rates rise. Inflation (purchasing power) risk: returns don't keep pace with inflation (biggest risk for fixed-income long-term holders). Reinvestment risk: coupon payments reinvested at lower rates when rates fall. Call risk: issuer calls bond when rates fall (hurts investor). Liquidity risk: can't sell quickly at fair price. Currency risk: foreign investments lose value from exchange rates. Legislative/regulatory risk: law changes hurt investment.</p></div>
+      <button class="domain-quiz-btn" onclick="startFilteredQuiz(2)">Practice Domain 2 Questions →</button>
+    </div>
+  </div>
+
+  <!-- DOMAIN 3 -->
+  <div class="domain-card">
+    <div class="domain-hdr" onclick="toggleDomain(this)">
+      <span class="domain-title">Domain 3 — Trading, Customer Accounts &amp; Prohibited Activities</span>
+      <div class="domain-right"><span class="domain-pct">31% · ~23 questions</span><span class="chevron">▶</span></div>
+    </div>
+    <div class="domain-body">
+      <div class="topic"><strong>Order Types</strong><p>Market order: execute immediately at best available price (guaranteed execution, not price). Limit order: execute only at specified price or better (guaranteed price, not execution). Stop order: becomes market order when stock hits stop price — used to limit losses or protect gains. Stop-limit: becomes limit order (not market) at trigger price — not guaranteed to execute. Day order: expires end of day. GTC (Good-til-Cancelled): stays open until filled or cancelled. AON (All-or-None): fill entire order or none. FOK (Fill or Kill): fill immediately and completely or cancel.</p></div>
+      <div class="topic"><strong>Trade Settlement</strong><p>Equities (stocks): T+1 (as of May 28, 2024 — SEC mandated change from T+2). Options: T+1. Municipal bonds: T+2. Corporate bonds: T+2. U.S. Treasuries: T+1. Cash settlement: same day (rare). Ex-dividend date: buy on or after = no dividend. Record date: must be on books as shareholder. Payment date: when dividend actually paid. Settlement terminology: regular way = standard settlement per security type.</p></div>
+      <div class="topic"><strong>Margin Accounts &amp; Regulation T</strong><p>Reg T: initial margin requirement = 50% for stock purchases and short sales (set by Federal Reserve). FINRA maintenance margin: minimum 25% equity for long positions, 30% for short positions. Margin call triggered when equity falls below maintenance. Minimum to open margin account: $2,000. Options: Reg T does NOT permit margin on option purchases — must be paid in full. Short selling: must be in margin account; borrow shares from broker, sell, hope price drops.</p></div>
+      <div class="topic"><strong>Customer Account Types</strong><p>Individual: one owner, one decision maker. Joint JTWROS (Joint Tenants With Right of Survivorship): deceased's share passes automatically to survivor(s). Joint TIC (Tenants in Common): deceased's share passes to estate (not survivor). Corporate accounts: authorized by corporate resolution. Trust accounts: managed per trust document. UGMA/UTMA: custodial accounts for minors — one custodian, one minor, irrevocable gift, becomes minor's property at majority (18–21). Fiduciary accounts: managed on behalf of another (guardian, executor, trustee).</p></div>
+      <div class="topic"><strong>New Account &amp; KYC Requirements</strong><p>Know Your Customer (KYC): FINRA Rule 2090. Must obtain: name, address, DOB, SSN/TIN, employment status, financial situation, investment objectives, risk tolerance. Beneficial ownership: for legal entity accounts, must identify all owners with 25%+ control. Form U4: registered rep's registration application. Customer account form must be signed. Suitability: recommendations must match customer's investment profile. Reg BI (Regulation Best Interest): BD must act in retail customer's BEST INTEREST, not just suitable.</p></div>
+      <div class="topic"><strong>Prohibited Practices — Market Manipulation</strong><p>Front-running: trading for firm's own account AHEAD of large customer orders. Churning/excessive trading: excessive transactions primarily to generate commissions. Painting the tape / wash trading: fake transactions to create appearance of trading activity. Pump and dump: spreading false positive information to inflate price, then selling. Marking the close: executing trades at day's end to manipulate closing price. Backing away: market maker refuses to honor quoted price. Spoofing: placing fake orders with intent to cancel before execution.</p></div>
+      <div class="topic"><strong>Insider Trading &amp; Information Barriers</strong><p>Material non-public information (MNPI): any info a reasonable investor would consider significant AND that is not public. Trading on MNPI = securities fraud. Tippers AND tippees can both be prosecuted (not just the trader). Chinese walls / information barriers: policies to prevent MNPI from flowing between departments (e.g., investment banking and trading). Misappropriation theory: using confidential info in breach of a duty = insider trading even if not a company insider.</p></div>
+      <div class="topic"><strong>Anti-Money Laundering (AML)</strong><p>Bank Secrecy Act (BSA): foundation of AML law. Currency Transaction Report (CTR): required for cash transactions exceeding $10,000 — filed with FinCEN. Suspicious Activity Report (SAR): required for suspicious transactions of $5,000 or more — filed with FinCEN within 30 days of detection. Structuring (smurfing): breaking up transactions to avoid $10,000 threshold — illegal itself. OFAC: Office of Foreign Assets Control — must screen customers against SDN (Specially Designated Nationals) list. CIP (Customer Identification Program): verify customer identity when opening accounts.</p></div>
+      <div class="topic"><strong>Corporate Actions</strong><p>Stock split (forward): shares increase, price decreases proportionally (2:1 → 100 shares @ $50 becomes 200 @ $25). Reverse split: shares decrease, price increases (reduces shareholders). Cash dividend: taxable in year paid. Stock dividend: additional shares issued, reduces per-share price proportionally, not taxable at receipt. Rights offering: existing shareholders offered right to buy new shares at discount (preemptive rights). Spin-off: company divides into separate companies. Tender offer: acquiring company offers to buy shares directly from shareholders at premium.</p></div>
+      <div class="topic"><strong>Other Prohibited Practices</strong><p>Selling away: registered rep sells products NOT offered by their broker-dealer without firm approval. Unauthorized trading: executing trades without customer authorization in non-discretionary accounts. Misrepresentation: false or misleading statements about securities. Guaranteeing against loss: prohibited — can never promise a customer they won't lose money. Sharing in customer accounts: prohibited unless registered rep has written customer AND firm approval, and shares proportional to contribution. Free-riding: buying and selling before paying (violates Reg T).</p></div>
+      <button class="domain-quiz-btn" onclick="startFilteredQuiz(3)">Practice Domain 3 Questions →</button>
+    </div>
+  </div>
+
+  <!-- DOMAIN 4 -->
+  <div class="domain-card">
+    <div class="domain-hdr" onclick="toggleDomain(this)">
+      <span class="domain-title">Domain 4 — Overview of the Regulatory Framework</span>
+      <div class="domain-right"><span class="domain-pct">9% · ~7 questions</span><span class="chevron">▶</span></div>
+    </div>
+    <div class="domain-body">
+      <div class="topic"><strong>Key Securities Laws</strong><p>Securities Act of 1933 ("Truth in Securities Act"): regulates NEW securities offerings — requires registration with SEC and prospectus delivery. Securities Exchange Act of 1934: created the SEC, regulates SECONDARY market trading, broker-dealers, exchanges. Investment Company Act of 1940: regulates mutual funds and other investment companies. Investment Advisers Act of 1940: regulates investment advisers. SIPC Act of 1970: created SIPC to protect customer assets at failed broker-dealers. Sarbanes-Oxley 2002: corporate governance reforms post-Enron.</p></div>
+      <div class="topic"><strong>SIPC Protection</strong><p>Protects customers of FAILED broker-dealers (not against market losses!). Covers up to $500,000 per customer account, with a $250,000 limit on cash claims. Separate SIPC coverage for: individual accounts, joint accounts, IRA accounts — each treated separately. SIPC does NOT cover: commodity futures, currency, investment contracts not registered as securities. Funded by member assessments (all FINRA member firms must be SIPC members).</p></div>
+      <div class="topic"><strong>Regulatory Bodies: SEC, FINRA, MSRB</strong><p>SEC (Securities and Exchange Commission): federal regulator, oversees ALL securities markets, administers securities laws, enforcement authority. FINRA (Financial Industry Regulatory Authority): SRO that regulates broker-dealers and registered reps. Writes rules, conducts exams, enforces. Funded by industry. MSRB (Municipal Securities Rulemaking Board): writes rules for municipal securities, but has NO direct enforcement power — FINRA enforces for BDs, SEC enforces for munis. SRO rules may be STRICTER than SEC rules, never less strict.</p></div>
+      <div class="topic"><strong>Registration &amp; Licensing</strong><p>Associated persons at FINRA member firms must be registered. Registration requires passing SIE + appropriate top-off exam (Series 6, 7, 57, etc.). Form U4: uniform registration application — must update within 30 days of material changes. Form U5: filed when registered person leaves a firm. Continuing education (CE): Regulatory Element (FINRA-mandated, online, within 1 year of initial registration then every 3 years), Firm Element (firm-administered, annually). NASAA: North American Securities Administrators Association — state-level securities regulation.</p></div>
+      <div class="topic"><strong>Regulation Best Interest (Reg BI)</strong><p>Effective June 2020. Applies to broker-dealers making recommendations to RETAIL CUSTOMERS only. Four components: Care obligation (act in customer's best interest), Conflict of interest obligation (identify and mitigate conflicts), Disclosure obligation (Form CRS), Compliance obligation. Investment advisers are held to a higher FIDUCIARY standard (must put client interest ahead of own at all times). Form CRS (Customer Relationship Summary): short document explaining relationship, services, fees — must be provided to retail investors.</p></div>
+      <button class="domain-quiz-btn" onclick="startFilteredQuiz(4)">Practice Domain 4 Questions →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LEARN TAB ============ -->
+<div id="learn" class="page">
+  <h2>Interactive Learning</h2>
+  <p style="margin-bottom:12px">Choose a topic to study with flashcards, memory tricks, and interactive tools.</p>
+
+  <select class="learn-sel" id="learnTopic" onchange="loadLearnTopic()">
+    <option value="">-- Pick a topic to study --</option>
+    <option value="bonds">Bond Pricing &amp; Yields</option>
+    <option value="options">Options (Calls &amp; Puts)</option>
+    <option value="funds">Mutual Funds &amp; ETFs</option>
+    <option value="margin">Margin Accounts &amp; Reg T</option>
+    <option value="settlement">Settlement &amp; Order Types</option>
+    <option value="aml">AML &amp; Prohibited Practices</option>
+    <option value="laws">Securities Laws</option>
+    <option value="risks">Risk Types</option>
+  </select>
+
+  <div id="learnContent"></div>
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div id="quiz" class="page">
+  <h2>Practice Questions</h2>
+  <div class="quiz-top">
+    <select class="domain-sel" id="domainFilter" onchange="initQuiz()">
+      <option value="0">All domains (mixed)</option>
+      <option value="1">Domain 1 — Capital Markets</option>
+      <option value="2">Domain 2 — Products &amp; Risks</option>
+      <option value="3">Domain 3 — Trading &amp; Accounts</option>
+      <option value="4">Domain 4 — Regulatory Framework</option>
+    </select>
+  </div>
+
+  <div class="score-box" id="scoreBox" style="display:none">
+    <div><div class="score-num" id="scoreFraction">0/0</div><div class="score-label">correct so far</div></div>
+    <div style="text-align:right"><div class="score-num" id="scorePct">—</div><div class="score-label">percent</div></div>
+  </div>
+
+  <div class="progress-track" id="progressTrack" style="display:none">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="progress-label" id="progressLabel">0 of 0</span>
+  </div>
+
+  <div id="quizArea"></div>
+  <div class="quiz-btns" id="quizBtns" style="display:none">
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">Next question →</button>
+    <button class="btn-restart" onclick="initQuiz()">Restart</button>
+  </div>
+</div>
+
+<!-- ============ TIPS ============ -->
+<div id="tips" class="page">
+  <h2>Exam Tips &amp; Key Numbers</h2>
+
+  <div class="tip-card">
+    <h3>Numbers you MUST memorize</h3>
+    <div class="numbers-grid">
+      <div class="num-box"><div class="num-big">70%</div><div class="num-label">Passing score (53/75)</div></div>
+      <div class="num-box"><div class="num-big">75</div><div class="num-label">Scored questions</div></div>
+      <div class="num-box"><div class="num-big">105</div><div class="num-label">Minutes (1hr 45min)</div></div>
+      <div class="num-box"><div class="num-big">50%</div><div class="num-label">Reg T initial margin</div></div>
+      <div class="num-box"><div class="num-big">25%</div><div class="num-label">FINRA maintenance margin (long)</div></div>
+      <div class="num-box"><div class="num-big">$2,000</div><div class="num-label">Min to open margin acct</div></div>
+      <div class="num-box"><div class="num-big">$10,000</div><div class="num-label">CTR cash threshold</div></div>
+      <div class="num-box"><div class="num-big">$5,000</div><div class="num-label">SAR suspicious threshold</div></div>
+      <div class="num-box"><div class="num-big">$500K</div><div class="num-label">SIPC max per customer</div></div>
+      <div class="num-box"><div class="num-big">$250K</div><div class="num-label">SIPC cash limit</div></div>
+      <div class="num-box"><div class="num-big">T+1</div><div class="num-label">Equity settlement (since May 2024)</div></div>
+      <div class="num-box"><div class="num-big">4 yrs</div><div class="num-label">SIE results validity period</div></div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <h3>Test-taking strategy</h3>
+    <p><strong>Process of elimination:</strong> Even if unsure, eliminate 2 wrong answers first. Odds jump from 25% to 50%.</p>
+    <p><strong>"Most likely" / "best describes":</strong> The SIE loves these qualifiers. All answers may have some truth — pick the BEST one.</p>
+    <p><strong>Flag &amp; skip:</strong> You have ~80 seconds per question. Don't dwell — flag and return. Never leave blank (no penalty for guessing).</p>
+    <p><strong>Watch for "EXCEPT" / "NOT":</strong> These questions are traps. Slow down and underline the negative word.</p>
+    <p><strong>Changing answers:</strong> Only change if you have a specific, concrete reason. First instinct is usually right.</p>
+    <p style="margin:0"><strong>Suitability questions:</strong> Match the investor's profile — young + aggressive = growth/equity; retired + conservative = bonds/income; high earner = municipals for tax benefit.</p>
+  </div>
+
+  <div class="tip-card">
+    <h3>Hawkish vs. Dovish (must know)</h3>
+    <p><strong>Hawkish</strong> (FRB raising rates): bond prices fall, investors should shorten duration, borrowing gets expensive, growth stocks hurt, banks benefit.</p>
+    <p style="margin:0"><strong>Dovish</strong> (FRB lowering rates): bond prices rise, longer duration bonds benefit most, growth stocks boosted, borrowing cheaper, housing market stimulated.</p>
+  </div>
+
+  <div class="tip-card">
+    <h3>Bond yield order when trading at premium or discount</h3>
+    <p><strong>Premium bond</strong> (price &gt; par): Coupon Rate &gt; Current Yield &gt; YTM &gt; YTC</p>
+    <p style="margin:0"><strong>Discount bond</strong> (price &lt; par): Coupon Rate &lt; Current Yield &lt; YTM &lt; YTC</p>
+    <p style="font-size:12px;color:#888;margin-top:4px">Memory trick: For premiums, all yields decrease from coupon. For discounts, all yields increase from coupon.</p>
+  </div>
+
+  <div class="tip-card">
+    <h3>Suitability quick reference</h3>
+    <p><strong>High tax bracket investor:</strong> Municipal bonds (tax-free federal interest)</p>
+    <p><strong>Safety-first investor:</strong> U.S. Treasury securities (no default risk)</p>
+    <p><strong>Income + some growth:</strong> Convertible bonds</p>
+    <p><strong>Inflation hedge:</strong> TIPS, equities, real assets</p>
+    <p><strong>Aggressive growth:</strong> Common stock, growth funds</p>
+    <p style="margin:0"><strong>Never put munis in an IRA:</strong> Wasting the tax advantage on an already tax-deferred account</p>
+  </div>
+
+  <div class="tip-card">
+    <h3>Logistics checklist</h3>
+    <p>✓ Register at <strong>finra.org</strong> (create account, pay $80 fee)<br>
+    ✓ Schedule at <strong>prometric.com/finra</strong> or choose online proctored option<br>
+    ✓ Valid government-issued photo ID required (must match FINRA record exactly)<br>
+    ✓ No personal items in testing room — locker provided<br>
+    ✓ Arrive 30 min early (late arrivals may be turned away)<br>
+    ✓ Calculator is on-screen (no personal calculators)<br>
+    ✓ Results displayed immediately after exam<br>
+    ✓ If you fail: 30-day wait before retake (third attempt: 180-day wait)</p>
+  </div>
+</div>
+
+<script>
+// =================== NAVIGATION ===================
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id === 'quiz') initQuiz();
+}
+
+function toggleDomain(hdr) {
+  const body = hdr.nextElementSibling;
+  const ch = hdr.querySelector('.chevron');
+  body.classList.toggle('open');
+  ch.classList.toggle('open');
+}
+
+function startFilteredQuiz(d) {
+  document.getElementById('domainFilter').value = d;
+  showPage('quiz');
+  document.querySelectorAll('.nav button')[3].classList.add('active');
+  document.querySelectorAll('.nav button').forEach((b,i) => { if(i!==3) b.classList.remove('active'); });
+  initQuiz();
+}
+
+// =================== QUIZ DATA ===================
+const QS = [
+  // Domain 1
+  {d:1,q:"Which of the following best describes the role of a market maker in the capital markets?",opts:["Executes trades on behalf of customers for a commission","Continuously quotes bid and ask prices and trades from their own inventory to provide liquidity","Acts as trustee for customer assets at a broker-dealer","Underwrites new securities offerings for corporate issuers"],ans:1,exp:"Market makers maintain orderly markets by always being willing to buy and sell a security. They quote both a bid (buy) price and an ask (sell) price and profit from the spread between the two."},
+  {d:1,q:"A corporation is issuing new shares of stock to the public for the very first time. This transaction takes place in which of the following markets?",opts:["Secondary market","Third market","Primary market","Fourth market"],ans:2,exp:"The primary market is where new securities are issued and sold for the first time, directly from the issuer to investors. An IPO is the classic example. After initial issuance, securities trade in the secondary market."},
+  {d:1,q:"A primary distribution differs from a secondary distribution in that:",opts:["A primary involves already-outstanding shares; a secondary involves newly issued shares","A primary involves newly issued shares sold by the issuer; a secondary involves outstanding shares sold among investors","A primary is regulated by state law; a secondary is regulated by federal law","A primary occurs on exchanges; a secondary occurs over-the-counter"],ans:1,exp:"In a primary distribution, the issuer sells newly created shares and receives the proceeds. In a secondary distribution, existing shareholders sell their shares — the issuer receives no proceeds from secondary transactions."},
+  {d:1,q:"Under a firm commitment underwriting arrangement, the underwriter:",opts:["Sells as many shares as possible but returns unsold shares to the issuer","Guarantees the entire offering by purchasing all shares from the issuer at a negotiated price","Cancels the offering if a minimum amount is not sold","Acts solely as agent for the issuer"],ans:1,exp:"In a firm commitment, the underwriter buys ALL shares from the issuer at a negotiated price, then resells them to the public. The underwriter assumes ALL unsold inventory risk. This is the most common type for large, established issuers."},
+  {d:1,q:"The Federal Reserve is considered 'hawkish' when it raises interest rates. Which of the following investment decisions is most consistent with a hawkish Fed policy?",opts:["Purchasing long-duration Treasury bonds","Buying growth stocks with high P/E ratios","Shortening the maturity of bond holdings","Increasing investment in real estate"],ans:2,exp:"When the Fed raises rates (hawkish), bond prices fall — especially longer-duration bonds which are more price-sensitive. Shortening maturity (duration) reduces interest rate risk. Rising rates also typically hurt growth stocks and real estate."},
+  {d:1,q:"A preliminary prospectus (red herring) may be distributed to potential investors:",opts:["Only after the SEC has approved the offering","During the cooling-off period while the registration statement is under SEC review","Only after the final offering price has been set","Only to institutional investors"],ans:1,exp:"A red herring may be distributed during the cooling-off period (waiting period) while the SEC reviews the registration statement. It contains most final prospectus content but omits the final offering price and effective date. The SEC does not 'approve' securities — it only reviews disclosure adequacy."},
+  {d:1,q:"Which of the following instruments is a money market security?",opts:["30-year Treasury bond","Common stock of a blue-chip company","90-day Treasury bill","10-year municipal revenue bond"],ans:2,exp:"Money market instruments are short-term (under 1 year) debt instruments. T-bills are issued with maturities up to 52 weeks. The 30-year T-bond and 10-year muni are long-term capital market instruments, and common stock is an equity security."},
+  {d:1,q:"An issuer wants to sell securities only to investors within its home state and uses Rule 147. Which requirement must be met?",opts:["All purchasers must be accredited investors","The issuer must be incorporated and doing business within the state","The securities must be registered with the SEC","The offering is limited to 35 non-accredited investors"],ans:1,exp:"Rule 147 provides an exemption for intrastate offerings. The issuer must be incorporated or organized in the state, doing a significant percentage of business there, and all purchasers must be residents of the state."},
+
+  // Domain 2
+  {d:2,q:"A 9% corporate bond is currently trading at 106. Which of the following statements is TRUE?",opts:["The bond is trading at a discount to par","The current yield is higher than the coupon rate","The yield to maturity is lower than the coupon rate","The investor will receive $106 per $1,000 bond on the next interest payment"],ans:2,exp:"The bond is trading at a PREMIUM (above $1,000 par). When a bond trades at a premium, both the current yield (annual interest / market price) and YTM are LOWER than the coupon rate, because you're paying more than you'll receive at maturity. Interest payments are based on the coupon rate applied to par ($1,000), not market price."},
+  {d:2,q:"An investor holds a bond with a 5% coupon. Market interest rates rise to 7%. What happens to the bond's market price?",opts:["It increases, because higher rates make the bond more attractive","It decreases, because new bonds pay more than this bond","It remains unchanged until the bond matures","It varies based on the issuer's credit rating"],ans:1,exp:"Bond prices and interest rates have an INVERSE relationship. If new bonds pay 7%, an existing 5% bond becomes less attractive. Its price must fall until its effective yield matches current market rates. This is the single most tested concept on the SIE."},
+  {d:2,q:"Which type of preferred stock requires that all missed dividend payments be paid to preferred shareholders before common shareholders receive any dividends?",opts:["Participating preferred","Non-cumulative preferred","Convertible preferred","Cumulative preferred"],ans:3,exp:"Cumulative preferred stock allows missed dividends to accumulate as 'dividends in arrears.' ALL accumulated preferred dividends must be paid before common shareholders receive any dividend. Non-cumulative preferred loses missed dividends permanently."},
+  {d:2,q:"A mutual fund has total assets of $100 million, total liabilities of $4 million, and 6 million shares outstanding. What is the NAV per share?",opts:["$16.00","$16.67","$16.40","$17.00"],ans:0,exp:"NAV = (Total Assets - Total Liabilities) / Shares Outstanding = ($100M - $4M) / 6M = $96M / 6M = $16.00 per share. This formula is tested frequently on the SIE."},
+  {d:2,q:"Which of the following is TRUE about a general obligation (GO) municipal bond compared to a revenue bond?",opts:["A revenue bond is backed by the full faith and credit of the municipality","A GO bond is repaid only from revenues of a specific project","A GO bond is backed by the municipality's taxing authority and is generally considered safer","Revenue bonds always have a higher credit rating than GO bonds"],ans:2,exp:"GO bonds are backed by the taxing power of the municipality — they can raise taxes to pay bondholders. Revenue bonds rely only on income from the specific project they finance (tolls, hospital fees, utilities). If the project fails, bondholders may not be paid. GOs are generally considered safer."},
+  {d:2,q:"An investor buys a call option on XYZ with a strike price of $50, paying a $4 premium. At expiration, XYZ is trading at $57. What is the investor's profit or loss?",opts:["$3 profit per share","$7 profit per share","$4 loss per share","$11 profit per share"],ans:0,exp:"Call profit at expiration = stock price - strike price - premium paid = $57 - $50 - $4 = $3 per share (or $300 per contract of 100 shares). The option is in the money by $7 (intrinsic value), but you subtract the $4 premium you paid, netting $3 profit."},
+  {d:2,q:"Which of the following best describes a 'covered call' strategy?",opts:["Buying a call option on a stock you don't own","Selling a call option on stock you already own","Buying both a call and a put with the same strike price","Selling a call option to hedge against market decline"],ans:1,exp:"A covered call = owning the underlying stock + selling a call option on that stock. The stock 'covers' the short call. Benefit: generates premium income. Risk: caps your upside if the stock rises above the strike price, since you'd have to deliver shares at the strike price."},
+  {d:2,q:"A variable annuity's investment subaccounts are held in which of the following?",opts:["The insurance company's general account","A separate account maintained apart from the insurer's general assets","A trust account at a commercial bank","A special reserve fund established by the SEC"],ans:1,exp:"Variable annuity subaccounts are held in a SEPARATE ACCOUNT, legally segregated from the insurer's general assets. This protects contract holders — if the insurer fails, these assets are not available to creditors. Fixed annuities are in the general account."},
+  {d:2,q:"Which of the following investment products requires investors to be 'accredited' and involves long lock-up periods and illiquid investments?",opts:["Open-end mutual funds","Exchange-traded funds (ETFs)","Direct Participation Programs (DPPs)","Money market mutual funds"],ans:2,exp:"DPPs (like real estate LPs, oil and gas programs) are illiquid, have long lock-up periods, and typically require investors to be accredited (net worth > $1M, or income > $200K/$300K joint). They pass through income and losses directly to investors but are not liquid."},
+  {d:2,q:"A Class A mutual fund share charges a front-end sales load of 5.5%. An investor purchases $10,000 worth of shares. How much is actually invested in the fund?",opts:["$10,000","$9,450","$10,550","$9,000"],ans:1,exp:"With a front-end load, the sales charge is deducted from the amount invested. $10,000 × 5.5% = $550 sales charge. Amount invested in fund = $10,000 - $550 = $9,450."},
+  {d:2,q:"ETFs differ from open-end mutual funds primarily because ETFs:",opts:["Are never passively managed","Calculate NAV multiple times throughout the trading day and are priced continuously","Are exempt from SEC regulation","Cannot be held in retirement accounts"],ans:1,exp:"ETFs trade on exchanges throughout the trading day at continuously fluctuating market prices — just like stocks. Open-end mutual funds calculate NAV only ONCE per day at market close (4pm ET). ETFs can also be sold short and bought on margin, unlike mutual funds."},
+  {d:2,q:"Which of the following BEST describes 'reinvestment risk' as it applies to bond investing?",opts:["The risk that the issuer will default on interest payments","The risk that bond prices will fall when interest rates rise","The risk that coupon payments will be reinvested at lower rates if interest rates decline","The risk that the bond will be called before maturity"],ans:2,exp:"Reinvestment risk is the risk that periodic coupon payments will need to be reinvested at lower interest rates than the original bond's yield, reducing total return. This risk is highest in a falling interest rate environment. Zero-coupon bonds have NO reinvestment risk (no periodic payments to reinvest)."},
+  {d:2,q:"A high-income investor in the 37% federal tax bracket is considering a municipal bond yielding 4%. What is the taxable equivalent yield?",opts:["4.00%","5.45%","6.35%","7.41%"],ans:2,exp:"Taxable Equivalent Yield = Muni Yield ÷ (1 - Tax Rate) = 4% ÷ (1 - 0.37) = 4% ÷ 0.63 = 6.35%. This means the investor would need a taxable bond yielding 6.35% to equal the after-tax return of the 4% muni."},
+
+  // Domain 3
+  {d:3,q:"A customer places a stop order to sell 100 shares at $40. The stock is currently trading at $45. This order will be triggered when:",opts:["The stock rises to $50","The stock falls to $40 or below","The stock falls below $40 only","The stock rises above $45"],ans:1,exp:"A sell stop order is placed BELOW the current market price to limit a loss or protect a profit. It becomes a market order when the stock TRADES AT OR BELOW the stop price ($40). Once triggered, it executes at the best available price (not necessarily $40)."},
+  {d:3,q:"Investor purchases 100 shares of stock at $60 per share in a margin account. Using Reg T's 50% initial requirement, how much must the investor deposit?",opts:["$6,000","$3,000","$1,500","$2,000"],ans:1,exp:"Reg T requires 50% initial margin. Total purchase = 100 × $60 = $6,000. Required deposit = $6,000 × 50% = $3,000. The broker lends the other $3,000. Note: the minimum to open a margin account is $2,000, but in this case $3,000 is required."},
+  {d:3,q:"A customer's margin account has securities worth $40,000 and a debit balance of $26,000. What is the customer's equity, and are they above FINRA's 25% maintenance margin requirement?",opts:["Equity = $14,000; yes, above 25% maintenance","Equity = $26,000; no, below maintenance","Equity = $14,000; no, below 25% maintenance","Equity = $40,000; yes, above maintenance"],ans:0,exp:"Equity = Market Value - Debit Balance = $40,000 - $26,000 = $14,000. Equity percentage = $14,000 / $40,000 = 35%. FINRA's 25% maintenance requirement = $40,000 × 25% = $10,000. Since equity ($14,000) exceeds $10,000, the account is above maintenance. No margin call."},
+  {d:3,q:"Under current settlement rules, a customer buys 200 shares of Apple stock on a Wednesday. On what day does regular-way settlement occur?",opts:["Wednesday (same day)","Thursday (T+1)","Friday (T+2)","Monday of the following week"],ans:1,exp:"As of May 28, 2024, U.S. equity securities settle T+1 (one business day after trade date). Wednesday trade date = Thursday settlement. This change from T+2 was mandated by the SEC to reduce counterparty risk."},
+  {d:3,q:"A registered representative executes numerous transactions in a customer's account, primarily to generate commissions, with no real benefit to the customer. This practice is known as:",opts:["Front-running","Painting the tape","Churning","Unauthorized trading"],ans:2,exp:"Churning is excessive trading in a customer's account primarily to generate commissions, not to benefit the customer. It is a violation of FINRA rules and securities law. Key indicators: high turnover ratio, costs that dwarf returns, trades inconsistent with stated investment objectives."},
+  {d:3,q:"A broker-dealer's AML compliance officer discovers a customer who regularly makes cash deposits of $9,500 — just below the $10,000 CTR threshold. This activity is known as:",opts:["Money laundering","Structuring (smurfing)","Front-running","Ponzi scheme operation"],ans:1,exp:"Structuring (also called 'smurfing') is the illegal practice of breaking up transactions specifically to avoid the $10,000 Currency Transaction Report threshold. It is itself a federal crime under the Bank Secrecy Act, even if the underlying funds are clean."},
+  {d:3,q:"Which of the following must a broker-dealer file when it detects a suspicious transaction of $5,000 or more?",opts:["Currency Transaction Report (CTR) with the IRS","Suspicious Activity Report (SAR) with FinCEN within 30 days","Form U4 with FINRA","A Reg D filing with the SEC"],ans:1,exp:"A SAR (Suspicious Activity Report) must be filed with FinCEN (Financial Crimes Enforcement Network) within 30 days of detecting suspicious activity involving $5,000 or more. CTRs are for cash transactions over $10,000 (not suspicious). SAR filings are confidential — you cannot tell the customer."},
+  {d:3,q:"In a Joint Tenants with Right of Survivorship (JTWROS) account, if one account owner dies:",opts:["The deceased's share passes to their estate","The entire account is frozen pending probate","The surviving owner(s) automatically receive the deceased's share","The account must be divided equally among all heirs"],ans:2,exp:"In JTWROS, when one owner dies, their share passes AUTOMATICALLY to the surviving owner(s) outside of probate — by operation of law. This contrasts with Tenants in Common (TIC), where a deceased owner's share passes to their estate according to the will."},
+  {d:3,q:"A registered representative sells investments from a company NOT affiliated with their broker-dealer, without the firm's knowledge or approval. This is called:",opts:["Selling away","Front-running","Unauthorized trading","Free-riding"],ans:0,exp:"Selling away is when a registered rep sells or solicits securities that are not offered through their employing broker-dealer, without the firm's knowledge and approval. It is a serious FINRA violation. Reps must get prior written approval from their firm before participating in any outside business activities or private securities transactions."},
+  {d:3,q:"Which of the following account types is established by a parent for a minor under the Uniform Transfers to Minors Act (UTMA)?",opts:["A discretionary account with the minor as beneficiary","A custodial account with one adult as custodian for one minor","A joint account with right of survivorship","A trust account managed by a bank"],ans:1,exp:"UGMA/UTMA accounts are custodial accounts: one custodian, one minor beneficiary. The gift is irrevocable — once assets are transferred to the minor's name, they cannot be taken back. Assets become the minor's property when they reach the age of majority (typically 18–21 depending on state and UGMA vs UTMA)."},
+  {d:3,q:"XYZ company announces a 3:2 forward stock split. An investor held 200 shares at $90 each before the split. After the split, how many shares does the investor hold and at what price?",opts:["300 shares at $60","150 shares at $135","200 shares at $60","300 shares at $45"],ans:0,exp:"A 3:2 split means for every 2 shares, you get 3. 200 × (3/2) = 300 shares. New price: $90 × (2/3) = $60 per share. Total value unchanged: 300 × $60 = $18,000 = 200 × $90 = $18,000. Splits don't change total value, just number of shares and per-share price."},
+
+  // Domain 4
+  {d:4,q:"The Securities Act of 1933 was primarily enacted to:",opts:["Regulate trading in the secondary securities markets","Create the Securities and Exchange Commission","Require disclosure in connection with the public offering of new securities","Establish SIPC protection for brokerage customers"],ans:2,exp:"The Securities Act of 1933 (the 'Truth in Securities Act' or 'Paper Act') governs NEW securities offerings. It requires issuers to register securities with the SEC and provide a prospectus with full disclosure to investors. The Securities Exchange Act of 1934 created the SEC and governs secondary market trading."},
+  {d:4,q:"SIPC protection covers which of the following?",opts:["Investment losses resulting from a market decline","Failure of an investment adviser to act in the client's best interest","Customer securities and cash in the event of a broker-dealer's insolvency","All of the above"],ans:2,exp:"SIPC (Securities Investor Protection Corporation) covers customer assets (securities and cash) if a broker-dealer FAILS or becomes insolvent. Coverage: up to $500,000 per customer, with a $250,000 limit on cash. SIPC does NOT protect against market losses, investment fraud, or bad advice."},
+  {d:4,q:"Regulation Best Interest (Reg BI) requires broker-dealers to act in the best interest of which type of customer?",opts:["Only institutional investors with assets over $10 million","Only retail customers when making investment recommendations","All customers at all times, regardless of account type","Only customers who have signed a Reg BI agreement"],ans:1,exp:"Reg BI applies specifically to recommendations made to RETAIL CUSTOMERS. Investment advisers are held to a fiduciary standard for all clients. Under Reg BI, broker-dealers must act in the retail customer's best interest, not just recommend 'suitable' investments — this is a higher standard than the old suitability rule."},
+  {d:4,q:"The Municipal Securities Rulemaking Board (MSRB) differs from FINRA in that the MSRB:",opts:["Has direct enforcement authority over municipal securities dealers","Regulates only investment advisers, not broker-dealers","Writes rules for the municipal securities market but has no direct enforcement power","Is a federal government agency, not a self-regulatory organization"],ans:2,exp:"The MSRB writes rules governing the municipal securities market, but it cannot enforce its own rules. Enforcement is carried out by FINRA (for broker-dealers) and the SEC (for municipal advisors and securities dealers). This is a classic SIE test question — know the MSRB's 'rule-making, no enforcement' role."},
+  {d:4,q:"A registered representative resigns from their broker-dealer. The firm is required to file which of the following forms?",opts:["Form U4 (Uniform Application for Securities Industry Registration)","Form U5 (Uniform Termination Notice for Securities Industry Registration)","Form BD (Broker-Dealer Registration Application)","Form ADV (Investment Adviser Registration)"],ans:1,exp:"Form U5 is filed when a registered representative terminates their association with a FINRA member firm — whether by resignation, firing, or retirement. Form U4 is the initial registration application. Form BD is filed by the broker-dealer itself to register with the SEC. Form ADV is for investment advisers."},
+  {d:4,q:"Which of the following securities laws regulates the activities of investment advisers and their fiduciary duties to clients?",opts:["Securities Act of 1933","Securities Exchange Act of 1934","Investment Advisers Act of 1940","Investment Company Act of 1940"],ans:2,exp:"The Investment Advisers Act of 1940 regulates investment advisers and requires those managing $110M+ in client assets to register with the SEC. It establishes the fiduciary standard — advisers must put client interests ahead of their own. The Investment Company Act of 1940 regulates mutual funds and closed-end funds."},
+  {d:4,q:"SRO (Self-Regulatory Organization) rules in relation to SEC rules must be:",opts:["Identical to SEC rules — no deviations permitted","Less restrictive than SEC rules to allow market flexibility","At least as strict as SEC rules, but may be stricter","Completely independent from SEC rules"],ans:2,exp:"SRO rules must be at a minimum as strict as SEC rules — SROs like FINRA and the MSRB may impose MORE stringent requirements, but cannot create rules that are LESS strict than the SEC's. This ensures investor protections are maintained across all regulatory layers."},
+];
+
+// =================== QUIZ ENGINE ===================
+let filteredQs=[], currentIdx=0, answered=false, score=0, attempted=0;
+
+function initQuiz() {
+  const d = parseInt(document.getElementById('domainFilter').value);
+  filteredQs = d===0 ? [...QS] : QS.filter(q=>q.d===d);
+  filteredQs = filteredQs.sort(()=>Math.random()-.5);
+  currentIdx=0; score=0; attempted=0; answered=false;
+  document.getElementById('scoreBox').style.display='none';
+  document.getElementById('progressTrack').style.display='none';
+  document.getElementById('quizBtns').style.display='none';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if(currentIdx >= filteredQs.length) { showFinalScore(); return; }
+  const q = filteredQs[currentIdx];
+  const dNames=['','Capital Markets','Products & Risks','Trading & Accounts','Regulatory Framework'];
+  answered = false;
+  document.getElementById('quizArea').innerHTML = `
+    <div class="q-num">Question ${currentIdx+1} of ${filteredQs.length} · Domain ${q.d}: ${dNames[q.d]}</div>
+    <div class="question-card">
+      <div class="question-text">${q.q}</div>
+      ${q.opts.map((o,i)=>`<button class="option" id="o${i}" onclick="selectAns(${i})">${'ABCD'[i]}. ${o}</button>`).join('')}
+      <div class="explain" id="explain">${q.exp}</div>
+    </div>`;
+  document.getElementById('quizBtns').style.display='flex';
+  document.getElementById('btnNext').style.display='inline-block';
+  updateScoreBox();
+  updateProgress();
+}
+
+function selectAns(i) {
+  if(answered) return;
+  answered=true; attempted++;
+  const q = filteredQs[currentIdx];
+  for(let j=0;j<4;j++){
+    const btn=document.getElementById('o'+j);
+    if(!btn) continue;
+    btn.disabled=true;
+    if(j===q.ans) btn.classList.add('correct');
+    else if(j===i) btn.classList.add('wrong');
+  }
+  if(i===q.ans) score++;
+  document.getElementById('explain').classList.add('show');
+  updateScoreBox();
+}
+
+function updateScoreBox() {
+  const box = document.getElementById('scoreBox');
+  box.style.display='flex';
+  document.getElementById('scoreFraction').textContent = score+'/'+attempted;
+  if(attempted>0){
+    const pct = Math.round(score/attempted*100);
+    document.getElementById('scorePct').textContent = pct+'%';
+    document.getElementById('scorePct').style.color = pct>=70?'#16a34a':'#dc2626';
+  }
+}
+
+function updateProgress() {
+  const track = document.getElementById('progressTrack');
+  track.style.display='flex';
+  const pct = Math.round(currentIdx/filteredQs.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent = currentIdx+' of '+filteredQs.length;
+}
+
+function nextQuestion() {
+  if(!answered){selectAns(-1); return;}
+  currentIdx++;
+  renderQuestion();
+  document.querySelector('.page.active').scrollTo?.(0,0);
+  window.scrollTo(0,140);
+}
+
+function showFinalScore() {
+  const pct = Math.round(score/filteredQs.length*100);
+  const pass = pct>=70;
+  document.getElementById('quizArea').innerHTML = `
+    <div class="final-score">
+      <div class="score-circle" style="color:${pass?'#16a34a':'#dc2626'};border-color:${pass?'#16a34a':'#dc2626'}">${pct}%</div>
+      <div class="grade-label">${pass?'Passing score! Great work.':'Keep going — you\'ll get there.'}</div>
+      <div class="grade-sub">${score} correct out of ${filteredQs.length} questions (need 70% to pass)</div>
+      ${!pass?'<p style="font-size:12px;color:#888;margin-top:8px">Review the Study Guide and Learn tabs for any topics you struggled with, then restart the quiz.</p>':''}
+    </div>`;
+  document.getElementById('quizBtns').style.display='flex';
+  document.getElementById('btnNext').style.display='none';
+}
+
+// =================== LEARN TAB ===================
+const FLASHCARD_SETS = {
+  bonds: [
+    {q:"Bond prices and yields have what kind of relationship?", a:"INVERSE — when interest rates rise, bond prices FALL. When rates fall, prices RISE. This is the #1 most tested bond concept."},
+    {q:"Formula for Current Yield", a:"Current Yield = Annual Interest (coupon) ÷ Current Market Price. Example: $80 coupon / $1,000 price = 8%"},
+    {q:"What does YTM stand for and what does it measure?", a:"Yield to Maturity — the total return if bond is held to maturity, accounting for price difference from par, coupon income, and time. Most comprehensive yield measure."},
+    {q:"Premium bond vs. Discount bond — which has higher YTM vs. coupon?", a:"Premium (price > par): Coupon > Current Yield > YTM. Discount (price < par): Coupon < Current Yield < YTM. As the yield relationship ALWAYS mirrors the price relationship."},
+    {q:"What is 'call risk' for bond investors?", a:"Call risk is the risk that the issuer redeems the bond before maturity when interest rates fall — precisely when the investor would prefer to keep earning the high coupon rate."},
+    {q:"What is a zero-coupon bond and what risk does it eliminate?", a:"Zero-coupon bonds are issued at a deep discount and pay no periodic interest — only face value at maturity. They eliminate REINVESTMENT RISK (no coupons to reinvest at lower rates). Tax note: phantom income is taxable each year."},
+    {q:"What day-count convention do municipal bonds use?", a:"30/360 — assumes each month has 30 days and each year has 360 days. (Treasury bonds use actual/actual.)"},
+    {q:"What is YTC and when is it most relevant?", a:"Yield to Call — the yield if a bond is called at the first call date. Most relevant when a bond is trading at a premium and call is likely."},
+  ],
+  options: [
+    {q:"Call option vs. Put option — what right does each give?", a:"CALL = right to BUY 100 shares at the strike price. PUT = right to SELL 100 shares at the strike price. Both require paying a premium to the seller (writer)."},
+    {q:"When is a call option 'in the money'?", a:"A call is in the money when the stock price is ABOVE the strike price. Intrinsic value = stock price - strike price. Example: $55 stock, $50 strike = $5 intrinsic value."},
+    {q:"When is a put option 'in the money'?", a:"A put is in the money when the stock price is BELOW the strike price. Intrinsic value = strike price - stock price. Example: $45 stock, $50 strike = $5 intrinsic value."},
+    {q:"What is a covered call and why do investors use it?", a:"Own the stock + SELL a call option. Generates premium income. The stock 'covers' the obligation. Risk: caps the upside if stock surges past the strike price."},
+    {q:"What is a protective put?", a:"Own the stock + BUY a put option. Acts as insurance against a stock price decline. Max loss is limited to (purchase price - strike price + premium paid). Also called 'married put' if put bought same day as stock."},
+    {q:"What is intrinsic value vs. time value of an option?", a:"Intrinsic value = how far in the money (never negative). Time value = premium - intrinsic value. Time value decreases as expiration approaches (theta decay). Out-of-the-money options have ONLY time value."},
+    {q:"American vs. European options — key difference?", a:"American options: can be exercised ANY TIME before expiration. European options: can ONLY be exercised ON the expiration date. Most exchange-traded equity options in the U.S. are American style."},
+    {q:"What is the max profit for a long call buyer?", a:"Theoretically UNLIMITED — the stock can rise without bound. Max loss = premium paid. Break-even = strike price + premium paid."},
+  ],
+  funds: [
+    {q:"Formula for calculating mutual fund NAV", a:"NAV = (Total Assets - Total Liabilities) ÷ Shares Outstanding. Calculated ONCE per day at market close (4:00 PM ET). All buy/sell orders at that day's closing NAV."},
+    {q:"What is the difference between Class A, B, and C mutual fund shares?", a:"A = front-end load (charged at purchase, lower ongoing expense). B = back-end/CDSC load (charged at redemption, converts to A later). C = level load (~1% annual 12b-1 fee, no front-end load, best for short term)."},
+    {q:"What is a 12b-1 fee?", a:"An ongoing annual fee charged by a mutual fund for distribution and marketing expenses. Paid from fund assets. Can be charged to all share classes. Maximum is 1% annually (0.25% = 'no-load' threshold)."},
+    {q:"How does an ETF differ from an open-end mutual fund?", a:"ETFs: trade continuously on exchanges at market prices throughout the day, like stocks. Can be shorted, bought on margin. Usually passively managed. Open-end mutual funds: priced only once daily at NAV. Cannot be shorted or margined. May be actively or passively managed."},
+    {q:"Can a closed-end fund trade at a discount to NAV?", a:"YES — closed-end funds trade on exchanges like stocks. Their market price is determined by supply/demand and can be ABOVE (premium) or BELOW (discount) the fund's NAV. Open-end funds always trade at exactly NAV."},
+    {q:"What is a Unit Investment Trust (UIT)?", a:"A UIT holds a fixed, unmanaged portfolio of securities. No ongoing investment management. Issues redeemable units that terminate on a set date. Lower costs than actively managed funds."},
+    {q:"Why should municipal bonds NOT be placed in an IRA or 401(k)?", a:"Municipal bond interest is already tax-exempt at the federal level. Placing munis in a tax-deferred account wastes the tax benefit — you'd be getting no additional tax advantage while accepting lower pre-tax yields than taxable bonds."},
+    {q:"What is the 'breakpoint' on mutual fund Class A share loads?", a:"Breakpoints are investment thresholds at which sales charges are reduced. Example: 5.75% load on amounts under $25,000 may drop to 5.0% for $25,000-$49,999, etc. Breakpoint selling (selling just below a breakpoint to maximize commission) is prohibited."},
+  ],
+  margin: [
+    {q:"What does Regulation T require for stock purchases?", a:"Reg T (set by the Federal Reserve) requires a 50% initial margin deposit for long stock purchases and short sales. The broker lends the remaining 50%."},
+    {q:"What is the FINRA minimum maintenance margin for long positions?", a:"25% equity (meaning the customer's equity cannot fall below 25% of the market value). Individual firms may set HIGHER 'house' requirements. Below 25% = margin call."},
+    {q:"What is the minimum equity to open a margin account?", a:"$2,000 in cash or fully paid securities. No margin can be extended below this amount, even if 50% Reg T would require less."},
+    {q:"How do you calculate equity in a long margin account?", a:"Equity = Current Market Value - Debit Balance (loan from broker). Equity % = Equity ÷ Market Value. Margin call when equity % falls below 25%."},
+    {q:"Can options be purchased on margin under Reg T?", a:"NO — Reg T does not permit margin on option PURCHASES. Options must be paid in full. However, selling (writing) options may require margin deposit as collateral."},
+    {q:"What happens in a margin call?", a:"When equity falls below maintenance requirement, the broker issues a margin call. The customer must deposit cash or securities to restore the account. If not met, the broker may sell securities in the account without notice."},
+    {q:"What is 'free-riding' in a cash account?", a:"Free-riding is buying a security and selling it before fully paying for it. It is prohibited under Reg T. Penalty: the account is 'frozen' for 90 days (must pay in full before placing orders)."},
+    {q:"What is the difference between initial margin and maintenance margin?", a:"Initial margin (50% per Reg T): what you must deposit when OPENING a position. Maintenance margin (25% per FINRA): the minimum equity you must maintain ONGOING while holding the position."},
+  ],
+  settlement: [
+    {q:"What is the regular-way settlement for listed equities (stocks)?", a:"T+1 — trade date plus ONE business day. This changed from T+2 to T+1 effective May 28, 2024, per SEC rule change."},
+    {q:"What is the settlement for municipal and corporate bonds?", a:"T+2 — two business days after trade date for both corporate and municipal bonds."},
+    {q:"What is the settlement for U.S. Treasury securities?", a:"T+1 — same as equities since 2024. Some short-term T-bills also settle same day (T+0) in certain cases."},
+    {q:"What is a 'market order' and what is guaranteed?", a:"A market order executes IMMEDIATELY at the best available price. EXECUTION is guaranteed — PRICE is not. Best for liquid securities where you prioritize speed over price."},
+    {q:"What is a 'stop order' and how does it work?", a:"A stop order is placed away from current market price. When the stock trades at or through the stop price, it BECOMES A MARKET ORDER. It then executes at the next available price (which may be worse)."},
+    {q:"What is a stop-LIMIT order?", a:"When the stop price is hit, the order becomes a LIMIT order (not a market order). May not execute if the price moves past the limit. Offers price control but sacrifices execution certainty."},
+    {q:"What does 'GTC' mean and when do GTC orders expire?", a:"GTC = Good-Til-Cancelled. The order stays open until it is filled or the customer cancels it. (In practice, most firms auto-expire GTC orders after 30-60 days.)"},
+    {q:"What is the ex-dividend date?", a:"The ex-dividend date is the first day a buyer of stock does NOT receive the declared dividend. If you buy ON or AFTER the ex-date, you don't get the dividend. With T+1 settlement, the ex-date is typically 1 business day before the record date."},
+  ],
+  aml: [
+    {q:"What is a Currency Transaction Report (CTR)?", a:"A CTR must be filed with FinCEN for any cash transaction (deposit, withdrawal, exchange) exceeding $10,000. Filed by the financial institution, not the customer. Mandatory regardless of whether the transaction seems suspicious."},
+    {q:"What is a Suspicious Activity Report (SAR)?", a:"A SAR must be filed with FinCEN within 30 days for any suspicious transaction involving $5,000 or more. The customer must NOT be told a SAR was filed — it is confidential. Filed when activity suggests money laundering, fraud, or other crimes."},
+    {q:"What is 'structuring' and is it legal?", a:"Structuring (smurfing) = deliberately breaking up transactions to stay below the $10,000 CTR reporting threshold. It is ILLEGAL under the Bank Secrecy Act, even if the underlying funds are legitimate."},
+    {q:"What is OFAC and what does it require?", a:"OFAC (Office of Foreign Assets Control) maintains the SDN (Specially Designated Nationals) list of sanctioned individuals, entities, and countries. Broker-dealers must screen all customers and transactions against this list and cannot do business with anyone on it."},
+    {q:"What is the CIP (Customer Identification Program)?", a:"Under the Patriot Act, broker-dealers must verify the identity of all new customers before opening accounts. Required info: name, address, DOB, and identification number (SSN for U.S. persons). Must be documented."},
+    {q:"What is 'front-running'?", a:"Front-running is when a broker-dealer (or registered rep) executes trades in their OWN account using advance knowledge of PENDING CUSTOMER ORDERS. Example: placing a personal buy order before executing a large customer buy order that will push the price up. It is prohibited."},
+    {q:"What is 'painting the tape' / 'wash trading'?", a:"Executing offsetting buy and sell transactions between related parties to create the appearance of trading activity in a security — artificially inflating volume to attract other investors. It is market manipulation and is prohibited."},
+    {q:"What is 'pump and dump'?", a:"Spreading false or misleading positive information about a company to artificially inflate its stock price (pump), then selling shares at the inflated price (dump), leaving other investors with losses. It is a form of securities fraud."},
+  ],
+  laws: [
+    {q:"Securities Act of 1933 — what does it regulate?", a:"Governs NEW securities offerings (primary market). Requires issuers to register with the SEC and provide a prospectus with full material disclosure. Nickname: 'Truth in Securities Act' or 'Paper Act.'"},
+    {q:"Securities Exchange Act of 1934 — what did it create and regulate?", a:"Created the SEC. Governs SECONDARY market trading, broker-dealers, exchanges, and reporting requirements for public companies. Also prohibits insider trading and fraud in the secondary market."},
+    {q:"Investment Company Act of 1940 — what does it regulate?", a:"Regulates investment companies including open-end (mutual funds), closed-end funds, and ETFs. Sets rules for structure, management, and disclosure for these pooled investment vehicles."},
+    {q:"Investment Advisers Act of 1940 — what does it regulate?", a:"Requires registration of investment advisers with the SEC (if managing $110M+ AUM) and establishes the FIDUCIARY STANDARD — advisers must put clients' interests ahead of their own at all times."},
+    {q:"SIPC (Securities Investor Protection Act of 1970) — what protection does it provide?", a:"Covers up to $500,000 per customer (max $250,000 in cash) if a broker-dealer becomes insolvent. Does NOT cover market losses, commodity futures, currencies, or investment company securities that the broker never acquired."},
+    {q:"What is Regulation Best Interest (Reg BI)?", a:"Effective June 2020. Requires broker-dealers to act in the BEST INTEREST of retail customers when making investment recommendations. Higher standard than old 'suitability.' Requires Form CRS disclosure. Applies to retail customers only."},
+    {q:"What is Form CRS?", a:"Customer Relationship Summary — a standardized 2-page disclosure form that broker-dealers and investment advisers must provide to retail investors. Summarizes services, fees, conflicts of interest, and whether the firm is acting as BD or IA."},
+    {q:"What is the difference between a broker-dealer's suitability obligation vs. a fiduciary standard?", a:"Broker-dealers (under Reg BI): must act in BEST INTEREST of retail customers for recommendations. Investment advisers: held to FIDUCIARY STANDARD at all times — must always prioritize client's interests above their own."},
+  ],
+  risks: [
+    {q:"What is 'market risk' (also called systematic risk)?", a:"The risk of loss due to broad market declines affecting virtually all investments. Cannot be eliminated through diversification. Examples: recessions, geopolitical events, pandemics. Measured by beta."},
+    {q:"What is 'credit risk' (default risk)?", a:"The risk that a bond issuer will fail to make interest or principal payments. U.S. Treasuries have essentially zero credit risk. Junk bonds (below BBB/Baa) have the highest credit risk."},
+    {q:"What is 'interest rate risk'?", a:"The risk that rising interest rates will cause bond prices to fall. Affects all fixed-income securities — the longer the maturity/duration, the MORE sensitive the price is to rate changes."},
+    {q:"What is 'inflation risk' (purchasing power risk)?", a:"The risk that investment returns won't keep pace with inflation, eroding real purchasing power. Greatest risk for long-term holders of fixed-rate bonds. TIPS and equities help hedge inflation risk."},
+    {q:"What is 'liquidity risk'?", a:"The risk of not being able to sell a security quickly at a fair price. Examples: DPPs, real estate, thinly traded stocks, private equity. Treasury securities have the LOWEST liquidity risk."},
+    {q:"What is 'call risk'?", a:"The risk that an issuer will call (redeem) a bond before maturity, usually when interest rates have fallen. The investor receives their principal back but must reinvest at lower prevailing rates."},
+    {q:"What is 'reinvestment risk'?", a:"The risk that coupon payments will be reinvested at lower rates than the original bond's yield (most relevant when rates are falling). Zero-coupon bonds eliminate reinvestment risk since there are no periodic payments."},
+    {q:"What is 'currency risk' (exchange rate risk)?", a:"The risk that foreign investments lose value due to unfavorable exchange rate movements. Example: a U.S. investor holding European stocks may lose money even if stocks rise in euros, if the dollar strengthens against the euro."},
+  ],
+};
+
+let fcIdx=0, fcSet=[], fcFlipped=false;
+
+function loadLearnTopic() {
+  const topic = document.getElementById('learnTopic').value;
+  if(!topic){document.getElementById('learnContent').innerHTML=''; return;}
+  const cards = FLASHCARD_SETS[topic];
+  fcSet = cards; fcIdx = 0; fcFlipped=false;
+  const topicInfo = {
+    bonds:{title:'Bond Pricing & Yields',desc:'Understanding bonds is essential — they appear across all 4 domains. Master the price/yield relationship, yield types, and bond math.'},
+    options:{title:'Options (Calls & Puts)',desc:'Options make up a significant portion of Domain 2. Know the basic strategies: long call, long put, covered call, and protective put.'},
+    funds:{title:'Mutual Funds & ETFs',desc:'Investment companies are heavily tested. Know NAV calculation, share classes, and differences between open-end, closed-end, and ETFs.'},
+    margin:{title:'Margin Accounts & Reg T',desc:'Margin questions are very common in Domain 3. Know the 50% initial requirement, 25% maintenance margin, and how to calculate equity.'},
+    settlement:{title:'Settlement & Order Types',desc:'Know all order types cold and current settlement times — the T+1 equity change from 2024 is tested frequently.'},
+    aml:{title:'AML & Prohibited Practices',desc:'Know the dollar thresholds ($5K SAR, $10K CTR), all prohibited practices by name, and what triggers each reporting requirement.'},
+    laws:{title:'Securities Laws',desc:'Know which law does what — 1933 (new offerings), 1934 (SEC/secondary market), 1940 Acts (funds & advisers), SIPC, and Reg BI.'},
+    risks:{title:'Risk Types',desc:'You must be able to identify the primary risk for any given product or scenario. Know all 8 key risk types by name and definition.'},
+  };
+  const info = topicInfo[topic];
+  document.getElementById('learnContent').innerHTML = `
+    <div class="learn-card">
+      <h3>${info.title}</h3>
+      <p>${info.desc}</p>
+    </div>
+    <div class="learn-card">
+      <h3>Flashcard drill — ${cards.length} cards</h3>
+      <p style="margin-bottom:8px;font-size:12px">Tap the card to flip it. Go through all cards, then quiz yourself.</p>
+      <div class="flashcard-area">
+        <div class="flashcard" id="fc" onclick="flipCard()">
+          <div class="card-face card-front">
+            <div>
+              <div class="fc-label">Question ${fcIdx+1} of ${cards.length}</div>
+              <div class="fc-text" id="fcQ">${cards[0].q}</div>
+              <div class="fc-label" style="margin-top:12px">tap to reveal answer</div>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <div>
+              <div class="fc-label">Answer</div>
+              <div class="fc-text" id="fcA" style="font-size:14px;font-weight:400;line-height:1.6">${cards[0].a}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button onclick="prevCard()">← Prev</button>
+        <span class="fc-counter" id="fcCount">Card 1 of ${cards.length}</span>
+        <button onclick="nextCard()">Next →</button>
+      </div>
+    </div>
+    <div class="learn-card" id="conceptPanel">
+      <h3>Key concepts to memorize</h3>
+      <div id="conceptGrid"></div>
+    </div>
+  `;
+  renderConceptGrid(topic);
+}
+
+function flipCard(){
+  fcFlipped = !fcFlipped;
+  document.getElementById('fc').classList.toggle('flipped', fcFlipped);
+}
+
+function nextCard(){
+  fcIdx = (fcIdx+1)%fcSet.length;
+  fcFlipped=false;
+  document.getElementById('fc').classList.remove('flipped');
+  document.getElementById('fcQ').textContent = fcSet[fcIdx].q;
+  document.getElementById('fcA').textContent = fcSet[fcIdx].a;
+  document.getElementById('fc').querySelector('.fc-label').textContent = `Question ${fcIdx+1} of ${fcSet.length}`;
+  document.getElementById('fcCount').textContent = `Card ${fcIdx+1} of ${fcSet.length}`;
+}
+
+function prevCard(){
+  fcIdx = (fcIdx-1+fcSet.length)%fcSet.length;
+  fcFlipped=false;
+  document.getElementById('fc').classList.remove('flipped');
+  document.getElementById('fcQ').textContent = fcSet[fcIdx].q;
+  document.getElementById('fcA').textContent = fcSet[fcIdx].a;
+  document.getElementById('fc').querySelector('.fc-label').textContent = `Question ${fcIdx+1} of ${fcSet.length}`;
+  document.getElementById('fcCount').textContent = `Card ${fcIdx+1} of ${fcSet.length}`;
+}
+
+const CONCEPTS = {
+  bonds:[
+    {label:'Price/Yield relationship',value:'Always INVERSE — rates up = prices down'},
+    {label:'Current Yield formula',value:'Annual coupon ÷ Market price'},
+    {label:'Premium bond yields',value:'Coupon > CY > YTM > YTC'},
+    {label:'Discount bond yields',value:'Coupon < CY < YTM < YTC'},
+    {label:'T-bill structure',value:'Issued at discount, no coupon, maturities up to 52 weeks'},
+    {label:'Zero coupon bonds',value:'No reinvestment risk, but phantom income taxed annually'},
+    {label:'Muni day-count',value:'30/360 calendar convention'},
+    {label:'Investment grade',value:'BBB- / Baa3 or above (S&P / Moody\'s)'},
+  ],
+  options:[
+    {label:'Call = right to BUY',value:'Profitable when stock price RISES above strike'},
+    {label:'Put = right to SELL',value:'Profitable when stock price FALLS below strike'},
+    {label:'Covered call',value:'Own stock + sell call → income, caps upside'},
+    {label:'Protective put',value:'Own stock + buy put → insurance against decline'},
+    {label:'Long call max loss',value:'Limited to premium paid'},
+    {label:'Long call max gain',value:'Unlimited (stock can rise indefinitely)'},
+    {label:'In the money (call)',value:'Stock price > strike price'},
+    {label:'In the money (put)',value:'Stock price < strike price'},
+  ],
+  funds:[
+    {label:'NAV formula',value:'(Assets − Liabilities) ÷ Shares Outstanding'},
+    {label:'NAV calculation',value:'Once daily at 4:00 PM ET market close'},
+    {label:'Class A shares',value:'Front-end load — best for long-term investors'},
+    {label:'Class B shares',value:'Back-end/CDSC load — converts to A shares'},
+    {label:'Class C shares',value:'Level load (annual ~1%) — best for short-term'},
+    {label:'12b-1 fee',value:'Annual distribution/marketing fee from fund assets'},
+    {label:'ETFs vs open-end',value:'ETFs trade continuously; mutual funds once daily at NAV'},
+    {label:'Closed-end funds',value:'Can trade at PREMIUM or DISCOUNT to NAV'},
+  ],
+  margin:[
+    {label:'Reg T initial requirement',value:'50% of purchase price (set by Federal Reserve)'},
+    {label:'FINRA maintenance (long)',value:'25% minimum equity'},
+    {label:'FINRA maintenance (short)',value:'30% minimum equity'},
+    {label:'Minimum to open account',value:'$2,000 in cash or securities'},
+    {label:'Options on margin',value:'NOT permitted — must pay in full under Reg T'},
+    {label:'Short selling',value:'Must be done in margin account, not cash account'},
+    {label:'Equity formula',value:'Equity = Market Value − Debit Balance'},
+    {label:'Free-riding penalty',value:'Account frozen 90 days in cash account'},
+  ],
+  settlement:[
+    {label:'Equities settlement',value:'T+1 (since May 28, 2024)'},
+    {label:'Treasuries settlement',value:'T+1'},
+    {label:'Corporate bonds',value:'T+2'},
+    {label:'Municipal bonds',value:'T+2'},
+    {label:'Options settlement',value:'T+1'},
+    {label:'Market order',value:'Executes immediately at best price — execution guaranteed'},
+    {label:'Limit order',value:'Executes at specified price or better — price guaranteed'},
+    {label:'Stop order',value:'Triggers at stop price, becomes market order'},
+  ],
+  aml:[
+    {label:'CTR threshold',value:'Cash transactions over $10,000'},
+    {label:'SAR threshold',value:'Suspicious transactions $5,000 or more'},
+    {label:'SAR filing deadline',value:'Within 30 days of detection'},
+    {label:'SAR confidentiality',value:'Cannot notify the customer — it\'s confidential'},
+    {label:'Structuring',value:'Breaking up transactions to avoid $10K — ILLEGAL'},
+    {label:'OFAC/SDN list',value:'Must screen all customers — cannot do business with listed entities'},
+    {label:'CIP requirement',value:'Verify: name, address, DOB, and ID number for all new accounts'},
+    {label:'Front-running',value:'Trading ahead of customer orders for firm/personal benefit'},
+  ],
+  laws:[
+    {label:'Securities Act 1933',value:'Regulates NEW offerings — prospectus/registration required'},
+    {label:'Securities Exchange Act 1934',value:'Created SEC, regulates secondary market & BDs'},
+    {label:'Investment Company Act 1940',value:'Regulates mutual funds and investment companies'},
+    {label:'Investment Advisers Act 1940',value:'Regulates IAs — establishes fiduciary duty'},
+    {label:'SIPC protection',value:'$500K per customer, $250K cash limit — covers BD failure, NOT losses'},
+    {label:'Reg BI',value:'BD must act in BEST INTEREST of retail customers'},
+    {label:'Form CRS',value:'2-page relationship summary required for retail investors'},
+    {label:'SRO rules vs SEC',value:'SRO rules must be at least as strict — can be stricter, not looser'},
+  ],
+  risks:[
+    {label:'Market risk',value:'Broad market decline — cannot diversify away'},
+    {label:'Credit/default risk',value:'Issuer fails to pay — highest for junk bonds'},
+    {label:'Interest rate risk',value:'Rising rates cause bond prices to fall'},
+    {label:'Inflation risk',value:'Returns don\'t keep up with inflation — worst for long-term fixed income'},
+    {label:'Liquidity risk',value:'Can\'t sell quickly at fair price — worst for DPPs, private equity'},
+    {label:'Call risk',value:'Bond called when rates fall — forced to reinvest at lower rates'},
+    {label:'Reinvestment risk',value:'Coupons reinvested at lower rates — zero-coupon bonds eliminate this'},
+    {label:'Currency risk',value:'Foreign investments lose value from exchange rate shifts'},
+  ],
+};
+
+function renderConceptGrid(topic) {
+  const items = CONCEPTS[topic]||[];
+  const html = items.map(c=>`
+    <div class="concept-block">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+    </div>`).join('');
+  document.getElementById('conceptGrid').innerHTML = html;
+}
+
+// init
+initQuiz();
+</script>
+</body>
+</html>
